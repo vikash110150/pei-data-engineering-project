@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql import functions as F
+from utils.string_cleaners import StringCleaner
 from typing import Dict
 import logging
 
@@ -15,9 +16,10 @@ class SilverTransformation:
     def customers(self, bronze_path, silver_table):
         df = self.spark.table(bronze_path)
         df = self._lowercase_columns(df)
+        df = StringCleaner.clean_string_column(df, "customer_name")
+        df = StringCleaner.clean_phone_column(df, "phone")
         df = (
             df.dropDuplicates(["customer_id"])
-              .withColumn("customer_name", F.initcap(F.trim(F.col("customer_name"))))
               .withColumn("country", F.initcap(F.trim(F.col("country"))))
               .withColumn("processing_timestamp", F.current_timestamp())
         )
