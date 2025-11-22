@@ -17,6 +17,11 @@ tables:
   gold:
     orders: "workspace.default.gold_orders"
     profit: "workspace.default.gold_profit"
+    profit_by_year: "workspace.default.gold_profit_by_year"
+    profit_by_year_category: "workspace.default.gold_profit_by_year_category"
+    profit_by_customer: "workspace.default.gold_profit_by_customer"
+    profit_by_customer_year: "workspace.default.gold_profit_by_customer_year"
+
 
 source_files:
   orders: "Orders.json"
