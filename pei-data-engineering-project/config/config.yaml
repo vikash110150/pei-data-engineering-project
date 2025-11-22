@@ -1,0 +1,55 @@
+# Configuration for PEI Data Engineering Project
+
+data_paths:
+  raw_base_path: "/Workspace/Users/vikash110150@gmail.com/raw_data/raw"
+
+tables:
+  bronze:
+    orders: "workspace.default.bronze_orders"
+    products: "workspace.default.bronze_products"
+    customers: "workspace.default.bronze_customers"
+
+  silver:
+    orders: "workspace.default.silver_orders"
+    products: "workspace.default.silver_products"
+    customers: "workspace.default.silver_customers"
+
+  gold:
+    orders: "workspace.default.gold_orders"
+    profit: "workspace.default.gold_profit"
+
+source_files:
+  orders: "Orders.json"
+  products: "Products.csv"
+  customers: "Customer.xlsx"
+
+
+# Data Processing Options
+processing:
+  # Enable schema evolution
+  enable_schema_evolution: true
+
+  # Partition columns
+  partition_columns:
+    orders: ["year"]
+    aggregates: ["year"]
+
+  # Optimization
+  enable_z_order: true
+  z_order_columns:
+    orders: ["order_id", "customer_id"]
+    aggregates: ["year", "product_category"]
+
+  # Data quality
+  enable_validation: true
+  enable_duplicate_check: true
+
+# Spark Configuration
+spark:
+  shuffle_partitions: 200
+  broadcast_threshold: 10485760  # 10MB
+
+# Testing Configuration
+testing:
+  test_data_path: "/Workspace/Users/vikash110150@gmail.com/raw_data/test"
+  sample_size: 1000

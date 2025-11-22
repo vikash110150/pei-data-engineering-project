@@ -1,0 +1,22 @@
+data_paths:
+  raw_base_path: "sample_data"
+
+tables:
+  bronze:
+    orders: "bronze_orders_test"
+    products: "bronze_products_test"
+    customers: "bronze_customers_test"
+
+  silver:
+    orders: "silver_orders_test"
+    products: "silver_products_test"
+    customers: "silver_customers_test"
+
+  gold:
+    orders: "gold_orders_test"
+    profit: "gold_profit_test"
+
+source_files:
+  orders: "Orders.json"
+  products: "Products.csv"
+  customers: "Customers.xlsx"
