@@ -83,9 +83,6 @@ def ingest_csv_to_bronze(source_path, entity_name):
           .withColumn("source_file", F.lit(source_path))
     )
 
-    # Print schema on notebook
-    df_bronze.printSchema()
-
     # Write table
     (df_bronze.write
         .format("delta")
