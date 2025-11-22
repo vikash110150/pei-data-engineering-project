@@ -1,7 +1,7 @@
 # Configuration for PEI Data Engineering Project
 
 data_paths:
-  raw_base_path: "/Workspace/Users/vikash110150@gmail.com/raw_data/raw"
+  raw_base_path: "/Workspace/Users/vikash110150@gmail.com/de_project/raw_data/raw"
 
 tables:
   bronze:
@@ -51,5 +51,5 @@ spark:
 
 # Testing Configuration
 testing:
-  test_data_path: "/Workspace/Users/vikash110150@gmail.com/raw_data/test"
+  test_data_path: "/Workspace/Users/vikash110150@gmail.com/de_project/raw_data/test"
   sample_size: 1000
