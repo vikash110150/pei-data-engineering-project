@@ -1,9 +1,7 @@
 # PEI Data Engineering Project
-## E-commerce Sales Data Processing with Databricks
 
 ### Project Overview
 This project implements a comprehensive data engineering solution for processing e-commerce sales data using Databricks, PySpark, and the Medallion Architecture pattern. The solution handles multiple data formats (CSV, JSON, XLSX) and provides robust data transformations with comprehensive unit testing.
-
 ---
 
 ## 🏗️ Architecture
@@ -12,46 +10,64 @@ This project implements a comprehensive data engineering solution for processing
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        DATA SOURCES                              │
-│  CSV (Orders)  │  JSON (Products)  │  XLSX (Customers)          │
-└────────────────┬────────────────────┬────────────────────────────┘
+│                        DATA SOURCES                             │
+│  JSON (Orders)  │  CSV (Products)  │  XLSX (Customer)           │
+└────────────────┬────────────────────┬───────────────────────────┘
                  │                    │
                  ▼                    ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      BRONZE LAYER (Raw Data)                     │
-│  • bronze_orders   • bronze_products   • bronze_customers        │
-│  • No transformations  • Data as-is from source                  │
-└────────────────┬────────────────────┬────────────────────────────┘
+│                      BRONZE LAYER (Raw Data)                    │
+│  • bronze_orders   • bronze_products   • bronze_customers       │
+│  • No transformations  • Data as-is from source                 │
+└────────────────┬────────────────────┬───────────────────────────┘
                  │                    │
                  ▼                    ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                   SILVER LAYER (Cleansed Data)                   │
-│  • silver_customers                                              │
-│  • silver_products                                               │
-│  • silver_orders(with profit, customer, product info)            │
-│  • Data quality checks  • Deduplication  • Schema enforcement    │
-└────────────────┬────────────────────┬────────────────────────────┘
-                 │                    │
-                 ▼                    ▼
+│                   SILVER LAYER (Cleansed Data)                  │
+│  • silver_customers                                             │
+│  • silver_products                                              │
+│  • silver_orders                                                │
+│                                                                 │
+│  ✔ Standardized schemas                                         │
+│  ✔ Data quality checks                                          │
+│  ✔ Cleaned + validated fields                                   │
+│  ✔ Duplication removed                                          │
+└───────────────────────┬───────────────────────┬─────────────────┘
+                        │                       │
+                        ▼                       ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                     GOLD LAYER (Aggregated)                      │
-│  • gold_profit_aggregates (Year, Category, SubCategory, Customer)│
-│  • Business-ready data  • Optimized for analytics                │
+│                         GOLD LAYER (Curated)                    │
+│                                                                 │
+│ 1 gold_orders                                                   │
+│     • Enriched fact table combining orders + customers +products│
+│     • Profit rounded to 2 decimals                              │
+│     • Cleaned + analytics-ready                                 │
+│     • Includes processing timestamp                             │
+│                                                                 │
+│ 2 gold_profit                                                   │
+│     • Yearly aggregated profit                                  │
+│     • Grouped by: Year, Customer, Category, Sub-Category        │
+│     • Metrics: SUM(profit), COUNT(order_id)                     │
+│     • All profit values rounded to 2 decimals                   │
+│                                                                 │
+│ 3  SQL Aggregates (Materialized Tables)                         │
+│     • profit_by_year                                            │
+│     • profit_by_year_category                                   │
+│     • profit_by_customer                                        │
+│     • profit_by_customer_year                                   │
+│                                                                 │
+│  ✔ Business-ready data                                          │
+│  ✔ Optimized for dashboards & reporting                         │
+│  ✔ Delivered as Delta tables (ACID, versioned)                  │
 └─────────────────────────────────────────────────────────────────┘
-```
-
----
 
 ## 📁 Project Structure
 
 ```
 pei-data-engineering-project/
 │
-├── notebooks/                          # Databricks notebooks
-│   ├── 01_Data_Ingestion.py           # Bronze layer - data ingestion
-│   ├── 02_Data_Transformation.py      # Silver layer - enrichment
-│   ├── 03_Data_Aggregation.py         # Gold layer - aggregations
-│   └── 04_Analytics_Queries.py        # SQL analytics queries
+├── config/
+│   └── config.yaml                    # Configuration file
 │
 ├── src/                                # Source code modules
 │   ├── bronze/
@@ -65,31 +81,51 @@ pei-data-engineering-project/
 │   │   └── aggregation.py             # Gold layer aggregation logic
 │   └── utils/
 │       ├── __init__.py
-│       ├── config.py                  # Configuration management
-│       ├── file_converter.py          # XLSX to CSV converter
-│       └── spark_utils.py             # Spark utility functions
+│       └── string_cleaners.py         # helper functions
 │
-├── tests/                              # Unit tests
+├── tests/                             # Unit tests
 │   ├── __init__.py
 │   ├── conftest.py                    # Pytest configuration
-│   ├── test_ingestion.py          # Bronze layer tests
-│   ├── test_transformation.py     # Silver layer tests
-│   ├── test_aggregation.py        # Gold layer tests
-│   └── test_file_converter.py     # File converter tests
+│   ├── test_ingestion.py              # Bronze layer tests
+│   ├── test_transformation.py         # Silver layer tests
+│   └── test_aggregation.py            # Gold layer tests
+│  
 │
-├── config/
-│   └── config.yaml                    # Configuration file
+│
+├── main()                         # End-to-end pipeline runner (Bronze → Silver → Gold)
+├── run_pytests                    # Notebook to execute all Pytest tests
 │
 ├── data/
 │   └── raw/                           # Sample/test data
 │
-├── requirements.txt                    # Python dependencies
+├── libs                               # Python library to read excel file
+│  
+├── requirements.txt                   # Python dependencies
 ├── setup.py                           # Package setup
 ├── pytest.ini                         # Pytest configuration
-└── README.md                          # This file
-```
+├── README.md                          # This file
+│
+│
+├── notebooks/                         # Databricks notebooks
+│   ├── 01_Data_Ingestion.py           # Created to test Initial Bronze layer - data ingestion
+│   ├── 02_Data_Transformation.py      # Created to test Initial Silver layer - enrichment
+│   ├── 03_Data_Aggregation.py         # Created to test Initial Gold layer - aggregations
+└── └── 04_Analytics_Queries.py        # Created to test Initial SQL analytics queries
 
----
+
+
+The entire project is version-controlled using Git.
+
+Repository Structure:
+• Git folder created to store all source code, notebooks, and configs
+• Code is committed and pushed regularly for version tracking
+• Suitable for collaborative development and CI/CD workflows
+
+Pipeline Overview — pei-data-engineering-pipeline
+This pipeline runs the complete end-to-end data flow:
+Raw Data → Bronze → Silver → Gold → pytest
+
+
 
 ## 🚀 Getting Started
 
@@ -102,26 +138,28 @@ pei-data-engineering-project/
 ### Installation Steps
 
 #### 1. Download Data from Google Drive
-```bash
-# Download the datasets from:
+# Downloaded the datasets from:
 # https://drive.google.com/drive/folders/1eWxfGcFwJJKAK0Nj4zZeCVx6gagPEEVc?usp=sharing
 
 # Expected files:
-# - orders.csv
-# - products.json
+# - orders.json
+# - products.csv
 # - customers.xlsx
 ```
 
 
 #### 3. Upload Data Files
 
-**Method 1: DBFS File Upload (UI)**
-```
-1. Go to Databricks workspace
-2. Click 'Data' in the left sidebar
-3. Click 'DBFS' → 'Upload'
-4. Upload your files to: /FileStore/pei-data-engineering/raw/
-```
+1. In Databricks, open the left sidebar.
+2. Go to **Workspace** → navigate to your project directory.
+3. Right-click and create a folder named: raw_data 
+4. Right-click the raw_data folder → **Upload**
+5. Upload the 3 source files:
+
+   • orders.json  
+   • products.csv  
+   • customers.xlsx  
+
 
 
 **Python Libraries**
@@ -135,7 +173,7 @@ pei-data-engineering-project/
 Edit `config/config.yaml` with your paths:
 ```yaml
 data_paths:
-  raw_base_path: "/Workspace/Users/vikash110150@gmail.com/raw_data/raw"
+  raw_base_path: "/Workspace/Users/vikash110150@gmail.com/de_project/raw_data/raw"
 
 tables:
   bronze:
@@ -158,57 +196,25 @@ source_files:
   customers: "Customer.xlsx"
 ```
 
----
 
-## Data Pipeline Execution
+## How to Run the Project
+Pipeline Overview — pei-data-engineering-pipeline
+The pipeline runs automatically (scheduled job)
+It can also be triggered manually from the Databricks UI
+Databricks Workspace → Jobs → pei-data-engineering-pipeline → Run Now
+This pipeline runs the complete end-to-end data flow:
 
-### Step-by-Step Execution
+## 1. Run the Entire Pipeline (`main()`)
+The `main()` notebook/script runs the full ETL pipeline:
+- Bronze ingestion
+- Silver cleansing
+- Gold aggregation
+- SQL materialization
+ **Path:** `main()`
+### 2. Run All Tests (`run_pytests`)
+The `run_pytests` notebook automatically discovers and executes all tests located under the `tests/` folder using Pytest.
 
-
-#### Step 2: Bronze Layer - Data Ingestion
-```python
-# Run: notebooks/01_Data_Ingestion.py
-# Creates: bronze_orders, bronze_products, bronze_customers
-```
-
-#### Step 3: Silver Layer - Data Transformation
-```python
-# Run: notebooks/02_Data_Transformation.py
-# Creates: silver_customers_enriched, silver_products_enriched, silver_orders_enriched
-```
-
-#### Step 4: Gold Layer - Data Aggregation
-```python
-# Run: notebooks/03_Data_Aggregation.py
-# Creates: gold_profit_aggregates
-```
-
-#### Step 5: Analytics Queries
-```python
-# Run: notebooks/04_Analytics_Queries.py
-# Generates: Profit by Year, by Category, by Customer, etc.
-```
-
----
-
-## 🧪 Testing
-
-### Running Unit Tests
-
-**In Databricks Notebook:**
-```python
-# Install pytest
-%pip install pytest
-
-# Run all tests
-!pytest /Workspace/Users/vikash110150@gmail.com/pei-data-engineering-project/tests/ -v
-
-# Run specific test module
-!pytest /Workspace/Users/vikash110150@gmail.com/pei-data-engineering-project/tests/unit/test_ingestion.py -v
-
-# Run with coverage
-!pytest /Workspace/Users/vikash110150@gmail.com/pei-data-engineering-project/tests/ --cov=src --cov-report=html
-```
+ **Path:** `run_pytests`
 
 **Test Coverage:**
 - Bronze layer ingestion tests
@@ -222,52 +228,52 @@ source_files:
 ## 📋 Task Requirements Implementation
 
 ### ✅ Task 1: Create raw tables for each source dataset
-- **Implemented in:** `notebooks/01_Data_Ingestion.py`
+- **Implemented in:** `ingestion.py`
 - **Tables:** `bronze_orders`, `bronze_products`, `bronze_customers`
 - **Format:** Delta tables with full schema inference
 
 ### ✅ Task 2: Create enriched table for customers and products
-- **Implemented in:** `notebooks/02_Data_Transformation.py`
+- **Implemented in:** `transformation.py`
 - **Tables:** `silver_customers_enriched`, `silver_products_enriched`
 - **Features:** Data cleansing, deduplication, schema standardization
 
 ### ✅ Task 3: Create enriched table with order information
-- **Implemented in:** `notebooks/02_Data_Transformation.py`
-- **Table:** `silver_orders_enriched`
-- **Includes:**
-  - Order information with profit (rounded to 2 decimals)
-  - Customer name and country
-  - Product category and sub-category
+
 
 ### ✅ Task 4: Create aggregate table showing profit by dimensions
-- **Implemented in:** `notebooks/03_Data_Aggregation.py`
-- **Table:** `gold_profit_aggregates`
-- **Dimensions:** Year, Product Category, Product Sub-Category, Customer
+Implemented in: aggregation.py
+Task 1: Create enriched Gold Orders table
+Includes:
+Orders joined with customers + products
+Profit rounded to 2 decimals
+Customer name, country
+Product category, sub-category
+Task 2: Create aggregated gold profit table
+Dimensions:Year,Customer,Category,Sub-Category
+Metrics:
+Total Profit (rounded)
+Total Orders
+Task 3: Generate SQL-based analytics tables
+Implemented in: aggregation.py
+Tables:
+profit_by_year
+profit_by_year_category
+profit_by_customer
+profit_by_customer_year
 
-### ✅ Task 5: SQL aggregates
-- **Implemented in:** `notebooks/04_Analytics_Queries.py`
-- **Queries:**
-  - Profit by Year
-  - Profit by Year + Product Category
-  - Profit by Customer
-  - Profit by Customer + Year
-
----
 
 ## 🛡️ Data Quality & Error Handling
 
 ### Implemented Checks:
 1. **Schema Validation:** Ensures correct data types and required columns
-2. **Null Handling:** Identifies and handles missing values
-3. **Duplicate Detection:** Removes duplicate records
-4. **Data Type Conversion:** Proper casting of numeric and date fields
-5. **Business Rule Validation:** Profit calculation validation
+2. **Duplicate Detection:** Removes duplicate records
+3. **Data Type Conversion:** Proper casting of numeric and date fields
+4. **Business Rule Validation:** Profit calculation validation
 
 ### Error Handling:
 - Try-catch blocks for file operations
 - Logging of errors and warnings
 - Graceful degradation for missing data
-- Transaction rollback on failures
 
 ---
 
