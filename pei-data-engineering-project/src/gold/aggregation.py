@@ -26,7 +26,6 @@ class GoldAggregation:
                   on="customer_id", how="left")
             .join(products.select("product_id", "category", "sub_category"),
                   on="product_id", how="left")
-            .withColumn("profit", F.round(F.col("profit"), 2))
             .withColumn("processing_timestamp", F.current_timestamp())
         )
 
@@ -66,6 +65,7 @@ class GoldAggregation:
         df_agg.write.format("delta") \
             .mode("overwrite") \
             .option("overwriteSchema", "true") \
+            .partitionBy("order_year")\
             .saveAsTable(target)
 
         return df_agg

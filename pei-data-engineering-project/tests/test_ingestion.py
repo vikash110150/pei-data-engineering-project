@@ -1,6 +1,6 @@
 from src.bronze.ingestion import BronzeIngestion
 
-RAW = "/Workspace/Users/vikash110150@gmail.com/raw_data/raw"
+RAW = "/Workspace/Users/vikash110150@gmail.com/de_project/raw_data/raw"
 
 def test_ingest_orders(spark):
     ingestion = BronzeIngestion(spark)
