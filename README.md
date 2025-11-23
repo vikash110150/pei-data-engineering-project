@@ -305,4 +305,3 @@ This project is created for educational and assessment purposes.
 
 ---
 
-**Happy Data Engineering!
