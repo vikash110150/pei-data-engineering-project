@@ -4,8 +4,8 @@
 # MAGIC ## Task 1: Create raw tables for each source dataset
 # MAGIC
 # MAGIC This notebook ingests data from various sources into the Bronze layer:
-# MAGIC - **Orders**: CSV format
-# MAGIC - **Products**: JSON format
+# MAGIC - **Orders**: JSON format
+# MAGIC - **Products**: CSV format
 # MAGIC - **Customers**: excel Format
 # MAGIC
 # MAGIC All data is stored as Delta tables in the Bronze layer.
@@ -33,8 +33,7 @@ logger = logging.getLogger(__name__)
 
 # COMMAND ----------
 
-RAW_BASE_PATH = "/Workspace/Users/vikash110150@gmail.com/raw_data/raw"
-
+RAW_BASE_PATH = "/Workspace/Users/vikash110150@gmail.com/de_project/raw_data/raw"
 ORDERS_FILE = f"{RAW_BASE_PATH}/Orders.json"
 PRODUCTS_FILE = f"{RAW_BASE_PATH}/Products.csv"
 CUSTOMERS_FILE = f"{RAW_BASE_PATH}/Customer.xlsx"
@@ -42,20 +41,35 @@ CUSTOMERS_FILE = f"{RAW_BASE_PATH}/Customer.xlsx"
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### Helper Functions
+
+# COMMAND ----------
+
+
 def clean_column_name(col):
     return (col.strip()
-              .replace(" ", "_")
-              .replace(",", "")
-              .replace(";", "")
-              .replace("{", "")
-              .replace("}", "")
-              .replace("(", "")
-              .replace(")", "")
-              .replace("\n", "")
-              .replace("\t", "")
-              .replace("=", "")
-           )
+            .replace(" ", "_")
+            .replace(",", "")
+            .replace(";", "")
+            .replace("{", "")
+            .replace("}", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("\n", "")
+            .replace("\t", "")
+            .replace("=", "")
+        )
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Bronze Ingestion
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Ingest Products
 
 # COMMAND ----------
 
@@ -100,17 +114,7 @@ df_bronze_products = ingest_csv_to_bronze(PRODUCTS_FILE, "products")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Helper Functions
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Ingest Orders
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Ingest Products
+# MAGIC ### Ingest Customers
 
 # COMMAND ----------
 
@@ -124,7 +128,6 @@ def ingest_excel_to_bronze(source_path, entity_name):
     """
 
     table_name = f"workspace.default.bronze_{entity_name.lower()}"
-    print(f" Ingesting Excel file into Bronze: {table_name}")
 
     # --- 1. Read Excel using Pandas ---
     df_pd = pd.read_excel(source_path)
@@ -153,7 +156,7 @@ def ingest_excel_to_bronze(source_path, entity_name):
         .mode("overwrite")
         .saveAsTable(table_name))
 
-    print(f"✓ Bronze table created: {table_name}\n")
+    
 
     return df_bronze
 
@@ -165,6 +168,11 @@ df_bronze_customers = ingest_excel_to_bronze(
     "customers"
 )
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Ingest Orders
 
 # COMMAND ----------
 
@@ -181,7 +189,7 @@ def ingest_json_to_bronze(source_path, entity_name):
 
     # --- 1. Read JSON file ---
     df = (spark.read.format("json")
-            .option("multiLine", "true")  # in case JSON contains objects spanning lines
+            .option("multiLine", "true")  
             .load(source_path))
 
     # --- 2. Clean column names ---
@@ -201,8 +209,6 @@ def ingest_json_to_bronze(source_path, entity_name):
         .mode("overwrite")
         .saveAsTable(table_name))
 
-    print(f"✓ Bronze table created: {table_name}\n")
-
     return df_bronze
 
 
@@ -213,8 +219,3 @@ df_bronze_orders = ingest_json_to_bronze(
     "orders"
 )
 
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ### Ingest Customers

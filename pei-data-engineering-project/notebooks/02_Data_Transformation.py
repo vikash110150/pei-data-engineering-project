@@ -1,7 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Silver Layer - Data Transformation
-# MAGIC ## Tasks 2 & 3: Create enriched tables
 
 # COMMAND ----------
 
@@ -10,8 +9,9 @@ from pyspark.sql import functions as F
 # COMMAND ----------
 
 # Configuration
-BRONZE_BASE_PATH = "/Workspace/Users/vikash110150@gmail.com/pei-data-engineering/bronze"
-SILVER_BASE_PATH = "/Workspace/Users/vikash110150@gmail.com/pei-data-engineering/silver"
+BRONZE_BASE_PATH = "/Workspace/Users/vikash110150@gmail.com/de_project/pei-data-engineering/bronze"
+SILVER_BASE_PATH = "/Workspace/Users/vikash110150@gmail.com/de_project/pei-data-engineering/silver"
+
 
 # COMMAND ----------
 
@@ -28,6 +28,11 @@ def read_delta(source, by_table=True):
         return spark.read.format("delta").load(source)
 
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Helper Functions
 
 # COMMAND ----------
 
@@ -103,6 +108,11 @@ def clean_phone_column(df, column_name):
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ###Create enriched silver_customers
+
+# COMMAND ----------
+
 customers = read_delta("workspace.default.bronze_customers", by_table=True)
 
 customers_enriched = (
@@ -128,6 +138,11 @@ customers_enriched.write.format("delta") \
 
 
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###Create enriched silver_products
 
 # COMMAND ----------
 
@@ -159,7 +174,7 @@ products_enriched.write.format("delta") \
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Task 3: Create enriched orders with profit and joins
+# MAGIC ###Create enriched silver_orders
 
 # COMMAND ----------
 

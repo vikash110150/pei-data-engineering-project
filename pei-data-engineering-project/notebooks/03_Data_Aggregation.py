@@ -1,11 +1,15 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Gold Layer - Data Aggregation
-# MAGIC ## Task 3: Create aggregate table with rounded upto 2 decimal place
 
 # COMMAND ----------
 
 from pyspark.sql import functions as F
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Helper Function
 
 # COMMAND ----------
 
@@ -15,6 +19,11 @@ def read_delta(source, by_table=True):
         return spark.table(source)
     else:
         return spark.read.format("delta").load(source)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###  Create gold orders table 
 
 # COMMAND ----------
 
@@ -51,13 +60,12 @@ gold_enriched.write \
     .option("overwriteSchema", "true") \
     .saveAsTable("workspace.default.gold_orders")
 
-display(gold_enriched.limit(10))
 
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Task 4: Create profit aggregates by Year, Category, SubCategory, Customer
+# MAGIC ### Create profit aggregates by Year, Category, SubCategory, Customer
 
 # COMMAND ----------
 
