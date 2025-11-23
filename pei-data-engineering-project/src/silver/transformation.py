@@ -43,10 +43,8 @@ class SilverTransformation:
         df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(silver_table)
         return df
 
-    def orders(self, bronze_path, silver_customers, silver_products, silver_table):
+    def orders(self, bronze_path, silver_table):
         orders = self.spark.table(bronze_path)
-        customers = self.spark.table(silver_customers)
-        products = self.spark.table(silver_products)
 
         # Lowercase bronze orders columns
         orders = self._lowercase_columns(orders)
@@ -56,21 +54,8 @@ class SilverTransformation:
             orders.dropDuplicates(["order_id"])
                     .withColumn("order_date_clean", F.expr("try_to_date(order_date, 'd/M/yyyy')"))
                     .withColumn("year", F.year("order_date_clean"))
+                    .withColumn("profit", F.round(F.col("profit"), 2))
                     .withColumn("processing_timestamp", F.current_timestamp())
-        )
-
-        # 2️ Select only needed customer fields
-        customers_sel = customers.select(
-            "customer_id",
-            "customer_name",
-            "country"
-        )
-
-        # 3️ Select only needed product fields
-        products_sel = products.select(
-            "product_id",
-            F.col("category").alias("product_category"),
-            F.col("sub_category").alias("product_sub_category")
         )
 
         # Save table
@@ -89,5 +74,5 @@ class SilverTransformation:
         return {
             "customers": self.customers(bronze['customers'], silver['customers']),
             "products": self.products(bronze['products'], silver['products']),
-            "orders": self.orders(bronze['orders'], silver['customers'], silver['products'], silver['orders'])
+            "orders": self.orders(bronze['orders'],  silver['orders'])
         }

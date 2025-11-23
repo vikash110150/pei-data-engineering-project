@@ -7,7 +7,6 @@ class StringCleaner:
     Utility class to clean string columns such as names, addresses, 
     and phone numbers.
     """
-   
 
     @staticmethod
     def clean_string_column(df: DataFrame, column_name: str) -> DataFrame:

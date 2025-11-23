@@ -30,8 +30,6 @@ def test_silver_orders(spark):
 
     df = transformer.orders(
         bronze_path="workspace.default.test_bronze_orders",
-        silver_customers="workspace.default.test_silver_customers",
-        silver_products="workspace.default.test_silver_products",
         silver_table="workspace.default.test_silver_orders"
     )
 
