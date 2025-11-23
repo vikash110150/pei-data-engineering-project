@@ -61,7 +61,9 @@ This project implements a comprehensive data engineering solution for processing
 │  ✔ Delivered as Delta tables (ACID, versioned)                  │
 └─────────────────────────────────────────────────────────────────┘
 
-## 📁 Project Structure
+##  Project Structure
+
+```
 
 ```
 pei-data-engineering-project/
@@ -81,7 +83,7 @@ pei-data-engineering-project/
 │   │   └── aggregation.py             # Gold layer aggregation logic
 │   └── utils/
 │       ├── __init__.py
-│       └── string_cleaners.py         # helper functions
+│       └── string_cleaners.py         # Helper functions
 │
 ├── tests/                             # Unit tests
 │   ├── __init__.py
@@ -89,30 +91,28 @@ pei-data-engineering-project/
 │   ├── test_ingestion.py              # Bronze layer tests
 │   ├── test_transformation.py         # Silver layer tests
 │   └── test_aggregation.py            # Gold layer tests
-│  
 │
-│
-├── main()                         # End-to-end pipeline runner (Bronze → Silver → Gold)
-├── run_pytests                    # Notebook to execute all Pytest tests
+├── main()                             # End-to-end pipeline runner (Bronze → Silver → Gold)
+├── run_pytests                        # Notebook to execute all Pytest tests
 │
 ├── data/
 │   └── raw/                           # Sample/test data
 │
-├── libs                               # Python library to read excel file
-│  
+├── libs/                              # Python library to read Excel file
+│
 ├── requirements.txt                   # Python dependencies
 ├── setup.py                           # Package setup
 ├── pytest.ini                         # Pytest configuration
 ├── README.md                          # This file
 │
-│
-├── notebooks/                         # Databricks notebooks
-│   ├── 01_Data_Ingestion.py           # Created to test Initial Bronze layer - data ingestion
-│   ├── 02_Data_Transformation.py      # Created to test Initial Silver layer - enrichment
-│   ├── 03_Data_Aggregation.py         # Created to test Initial Gold layer - aggregations
-└── └── 04_Analytics_Queries.py        # Created to test Initial SQL analytics queries
+└── notebooks/                         # Databricks notebooks
+    ├── 01_Data_Ingestion.py           # Test Bronze ingestion
+    ├── 02_Data_Transformation.py      # Test Silver transformation
+    ├── 03_Data_Aggregation.py         # Test Gold aggregation
+    └── 04_Analytics_Queries.py        # Test SQL analytics queries
+```
 
-
+```
 
 The entire project is version-controlled using Git.
 
@@ -124,9 +124,9 @@ Repository Structure:
 Pipeline Overview — pei-data-engineering-pipeline
 This pipeline runs the complete end-to-end data flow:
 Raw Data → Bronze → Silver → Gold → pytest
+```
 
-
-
+```
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -147,7 +147,7 @@ Raw Data → Bronze → Silver → Gold → pytest
 # - customers.xlsx
 ```
 
-
+```
 #### 3. Upload Data Files
 
 1. In Databricks, open the left sidebar.
@@ -162,6 +162,7 @@ Raw Data → Bronze → Silver → Gold → pytest
 
 
 
+```
 **Python Libraries**
 ```python
 # Run in notebook
